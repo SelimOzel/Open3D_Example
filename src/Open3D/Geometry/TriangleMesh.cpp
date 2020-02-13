@@ -1357,6 +1357,100 @@ bool TriangleMesh::IsIntersecting(const TriangleMesh &other) const {
     return false;
 }
 
+void TriangleMesh::DepthFirstSearch(int input_node, std::vector<int> &input_neighbor_nodes, std::vector<Eigen::Vector3d> &input_vertex_colors, Eigen::Vector3d input_search_color, std::vector<int> &return_vector)
+{ 
+    // Detection of this color terminates search.
+    Eigen::Vector3d termination_color(-1,-1,-1);
+
+    // Follow path if color match detected.
+    if (input_vertex_colors[input_node] == input_search_color)
+    {
+        input_vertex_colors[input_node] = termination_color;
+
+        // !!Largest path is generated dynamically here.
+        return_vector.push_back(input_node);
+    }
+    else
+    // Don't follow paths with non-search colors
+    {
+        return;
+    }
+
+    // Iterate through all adjacent nodes
+    for (int i = 0; i<input_neighbor_nodes.size(); i++)
+    {
+        // Get all adjacent nodes to the next node.
+        // Note that next node is at input_neighbor_nodes[i]
+        std::vector<int> neighbor_nodes_local;
+        for (const auto& neighbor: adjacency_list_[input_neighbor_nodes[i]])
+        {
+            neighbor_nodes_local.push_back(neighbor);
+        }
+        DepthFirstSearch(input_neighbor_nodes[i], neighbor_nodes_local, input_vertex_colors, input_search_color, return_vector);
+    }
+}
+
+std::vector<std::vector<int>> TriangleMesh::IdenticallyColoredConnectedComponents()
+{
+    // Find all different RGB colors in the mesh
+    // * See optimization comment below.
+    // * Refactor: Color find can be written as a seperate function.
+    std::vector<Eigen::Vector3d> different_colors;
+    for (int i = 0; i<vertices_.size(); i++ )
+    {
+        // O(n^2) search for different colors. Can be optimized with binary search with a sorted color array.
+        std::vector<Eigen::Vector3d>::iterator it = find(different_colors.begin(), different_colors.end(), vertex_colors_[i]);
+
+        // Add the first color or add the new color not in the list
+        if (i == 0 || it == different_colors.end())
+        {
+            different_colors.push_back(vertex_colors_[i]);
+        }
+    }
+
+    // Compute connected components for each color below!
+    // * Depth first search statring from first node is implemented
+    // * This matrix holds all identically-colored-connected node clusters
+    std::vector<std::vector<int>> return_matrix;
+
+    // Using extra space to do depth first search on copied version.
+    std::vector<Eigen::Vector3d> vertex_colors_copy = vertex_colors_;
+
+    for (int colorIndex = 0; colorIndex<different_colors.size(); colorIndex++)
+    {
+        // Go through all vertices with dfs
+        int vertexIndex = 0;
+
+        for (const auto& neighbors: adjacency_list_) {
+            // Get all adjacent nodes to the current one
+            std::vector<int> neighbor_nodes;
+            for (const auto& neighbor: neighbors)
+            {
+                neighbor_nodes.push_back(neighbor);
+            }
+
+            // Color match indicates start node for depth first search
+            if (different_colors[colorIndex] == vertex_colors_copy[vertexIndex])
+            {
+                // !! New potential largest path start nodes are discovered here.
+                std::vector<int> return_vector;
+                DepthFirstSearch(vertexIndex, neighbor_nodes, vertex_colors_copy, different_colors[colorIndex], return_vector);
+                
+                // Sort elements within the list and push to matrix
+                sort (return_vector.begin(), return_vector.end());
+
+                return_matrix.push_back(return_vector);
+            }
+            vertexIndex++;
+        }  
+    }
+
+    // Sort each list within the matrix with respect to smallest element in each list
+    sort (return_matrix.begin(), return_matrix.end());
+
+    return return_matrix;
+}
+
 std::tuple<std::vector<int>, std::vector<size_t>, std::vector<double>>
 TriangleMesh::ClusterConnectedTriangles() const {
     std::vector<int> triangle_clusters(triangles_.size(), -1);

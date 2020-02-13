@@ -577,6 +577,21 @@ public:
                                                        double width = 1,
                                                        double scale = 1);
 
+    // Use depth first search to find 
+    // identically colored connected components
+    // * Refactor: function scope/implementation
+    void DepthFirstSearch(int input_node, 
+                            std::vector<int> &input_neighbor_nodes, 
+                            std::vector<Eigen::Vector3d> &input_vertex_colors, 
+                            Eigen::Vector3d input_search_color, 
+                            std::vector<int> &return_vector);
+
+    /// Computes identically colored connected components and returns a 2D
+    /// matrix containing node numbers. Order of node number lists is ascending
+    /// starting from the list with the smallest minimum element. Node numbers
+    /// inside lists are ordered ascending starting from smallest element.
+    std::vector<std::vector<int>> IdenticallyColoredConnectedComponents();
+
 protected:
     // Forward child class type to avoid indirect nonvirtual base
     TriangleMesh(Geometry::GeometryType type) : MeshBase(type) {}
