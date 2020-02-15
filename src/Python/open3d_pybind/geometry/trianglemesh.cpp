@@ -305,6 +305,9 @@ void pybind_trianglemesh(py::module &m) {
                  "vertex_mask. Note that also all triangles associated with "
                  "the vertices are removed.",
                  "vertex_mask"_a)
+            .def("identically_colored_connected_components",
+                 &geometry::TriangleMesh::IdenticallyColoredConnectedComponents,
+                 "Computes identically colored connected components and returns a 2D matrix containing node numbers.")            
             .def("deform_as_rigid_as_possible",
                  &geometry::TriangleMesh::DeformAsRigidAsPossible,
                  "This function deforms the mesh using the method by Sorkine "
