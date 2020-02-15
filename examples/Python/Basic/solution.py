@@ -3,7 +3,8 @@ import open3d
 print("Intel Solution for Open3D by Selim Ozel:")
 
 # Read triangle mesh "test_mesh.ply"
-mesh = open3d.io.read_triangle_mesh("test_mesh.ply");
+#mesh = open3d.io.read_triangle_mesh("../../../examples/TestData/test_mesh_Small.ply");
+mesh = open3d.io.read_triangle_mesh("../../../examples/TestData/test_mesh.ply");
 print("Mesh read.")
 
 # Compute adjacency list

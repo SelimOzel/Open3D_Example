@@ -16,14 +16,14 @@ using namespace std;
 
 int main()
 {
-	// Read triangle mesh "test_mesh.ply"
-	geometry::TriangleMesh mesh;
+    // Read triangle mesh "test_mesh.ply"
+    geometry::TriangleMesh mesh;
 
-	// Use the ReadTrianbleMesh function defined under TriangleMeshIO.h
-	//io::ReadTriangleMesh("test_mesh_Small.ply", mesh);
-	io::ReadTriangleMesh("test_mesh.ply", mesh);
+    // Use the ReadTrianbleMesh function defined under TriangleMeshIO.h
+    //io::ReadTriangleMesh("../../examples/TestData/test_mesh_Small.ply", mesh);
+    io::ReadTriangleMesh("../../examples/TestData/test_mesh.ply", mesh);
 
-	// Intro messages
+    // Intro messages
     cout << "\nIntel Solution for Open3D by Selim Ozel: \n";
     cout << "Test mesh has " << mesh.vertices_.size() << " vertices. \n";
     cout << "Test mesh has " << mesh.triangles_.size() << " triangles. \n";
@@ -54,5 +54,5 @@ int main()
 
     cout << "Results written to \"results.txt\" \n";
 
-    return 0;	
+    return 0;   
 }
