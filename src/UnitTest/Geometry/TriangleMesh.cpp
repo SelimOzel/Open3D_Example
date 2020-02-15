@@ -453,6 +453,59 @@ TEST(TriangleMesh, ComputeVertexNormals) {
     ExpectEQ(ref, tm.vertex_normals_);
 }
 
+TEST(TriangleMesh, IdenticallyColoredConnectedComponents)
+{
+    geometry::TriangleMesh mesh;
+
+    // Create the mesh given in the homework document
+    mesh.vertices_ = {{0.0, 0.0, 0.0},
+                      {1.0, 0.0, 0.0},
+                      {2.0, 0.0, 0.0},
+                      {3.0, 0.0, 0.0},
+                      {4.0, 0.0, 0.0},
+                      {5.0, 0.0, 0.0},
+                      {6.0, 0.0, 0.0}
+                     };
+
+    mesh.vertex_colors_ = { {255, 0, 0}, 
+                            {0, 255, 0},
+                            {0, 0, 255},
+                            {255, 0, 0},
+                            {0, 255, 0},
+                            {255, 0, 0},
+                            {255, 0, 0}
+                          }; 
+
+    mesh.triangles_ = { {0, 2, 3}, 
+                        {0, 3, 1},
+                        {1, 3, 4},
+                        {2, 5, 3},
+                        {3, 5, 6},
+                        {3, 6, 4}
+                      };                   
+
+    // Compute adjacency list
+    mesh.ComputeAdjacencyList(); 
+
+    // Compute all identically colored connected components
+    vector<vector<int>> result = mesh.IdenticallyColoredConnectedComponents();
+    vector<vector<int>> result_ref = {{0, 3, 5, 6}, {1, 4}, {2}};
+    bool test_flag = true;
+
+    for (int i = 0; i<result.size() ; i++)
+    {
+        for (int j = 0; j<result[i].size(); j++)
+        {
+            if(result_ref[i][j] != result[i][j])
+            {
+                test_flag = false;
+            }
+        }
+    }
+    
+    EXPECT_TRUE(test_flag);
+}
+
 TEST(TriangleMesh, ComputeAdjacencyList) {
     // 4-sided pyramid with A as top vertex, bottom has two triangles
     Eigen::Vector3d A(0, 0, 1);    // 0
